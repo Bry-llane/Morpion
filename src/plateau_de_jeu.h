@@ -1,6 +1,7 @@
 #ifndef PLATEAU_DE_JEU_H
 #define PLATEAU_DE_JEU_H
 
+#include <conio.h>
 #include <stdbool.h>
 
 ///====================Piont==============================

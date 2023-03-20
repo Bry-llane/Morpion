@@ -7,7 +7,8 @@
 	"quintuplets.h"
 	"interface.h"
 
-1679259896 c:\projet_arith\l3\src\plateau_de_jeu.h
+1679312090 c:\projet_arith\l3\src\plateau_de_jeu.h
+	<conio.h>
 	<stdbool.h>
 
 1676661170 c:\projet_arith\l3\src\quintuplets.h
@@ -25,7 +26,7 @@
 	<stdlib.h>
 	"quintuplets.h"
 
-1679260024 source:c:\projet_arith\l3\src\interface.c
+1679312090 source:c:\projet_arith\l3\src\interface.c
 	<SDL2/SDL.h>
 	<stdio.h>
 	<stdlib.h>
@@ -38,6 +39,8 @@
 	<stdio.h>
 	<stdlib.h>
 
-1679259125 c:\projet_arith\l3\src\interface.h
+1679312335 c:\projet_arith\l3\src\interface.h
+	<unistd.h>
+	<conio.h>
 	"plateau_de_jeu.h"
 

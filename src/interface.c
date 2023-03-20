@@ -923,7 +923,7 @@ void menu_newgame()
     printf("Nombre de piont gagnant : ");
     while(true){
         nbpiontwin = isInt();
-        if((nbpiontwin <= min(lig, col)) && (nbpiontwin != 1) && (nbpiontwin != 2)) {
+        if((nbpiontwin <= min(lig, col)) && (nbpiontwin != 1) && (nbpiontwin != 2) && (nbpiontwin != 0)) {
             break;
         } else {
             printf("Nb <= min(ligne, colonne) et Nb > 2 : ");
