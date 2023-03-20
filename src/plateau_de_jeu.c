@@ -3,14 +3,14 @@
 #include "quintuplets.h"
 #include "plateau_de_jeu.h"
 
-///======================================================
+///=======================================================
 
 void clear_screen()
 {
     printf("\e[1;1H\e[2J");
 }
 
-///======================================================
+///========================================================
 
 board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour)
 {
@@ -107,7 +107,8 @@ bool PutPiont (board b, piont p, int lig, int col)
 
 ///=========================================================
 
-void gotoxy(int x, int y){
+void gotoxy(int x, int y)
+{
     printf("\x1b[%d;%dH", y+1, x+1);
 }
 
@@ -145,11 +146,10 @@ int* Coup (board b, piont p)
 {
     int lig = 0;
     int col = 0;
-    int dir = 0;
     int enter;
     int x = 2, y = 1;
     char c;
-    int* cord[2];
+    int* cord = (int) malloc(sizeof(int)*2);
 
     while(true)
     {

@@ -20,14 +20,15 @@ typedef struct board {
 
 ///====================Fonctions==========================
 
+void clear_screen();
 board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour);
-void PrintBoard(board b);
 void PrintBoardBis(board b);
 bool TestEmpty (board b, int lig, int col);
 piont RecupPiont (board b, int lig, int col);
-bool putPiont (board b, piont p, int lig, int col);
+bool PutPiont (board b, piont p, int lig, int col);
+void gotoxy(int x, int y);
 int* UnCoup (board b, piont p);
-int* UnCoupDirection (board b, piont p);
+int* Coup (board b, piont p);
 int* MachineJoue (board b, piont p);
 
 #endif
