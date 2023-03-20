@@ -2,7 +2,6 @@
 #define INTERFACE_H
 
 #include <unistd.h>
-#include <conio.h>
 #include "plateau_de_jeu.h"
 
 void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer);

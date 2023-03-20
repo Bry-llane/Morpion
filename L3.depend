@@ -15,13 +15,13 @@
 	<stdbool.h>
 	"plateau_de_jeu.h"
 
-1679260024 source:c:\projet_arith\l3\src\plateau_de_jeu.c
+1679312335 source:c:\projet_arith\l3\src\plateau_de_jeu.c
 	<stdio.h>
 	<stdlib.h>
 	"quintuplets.h"
 	"plateau_de_jeu.h"
 
-1677157745 source:c:\projet_arith\l3\src\quintuplets.c
+1679312335 source:c:\projet_arith\l3\src\quintuplets.c
 	<stdio.h>
 	<stdlib.h>
 	"quintuplets.h"
@@ -39,8 +39,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1679312335 c:\projet_arith\l3\src\interface.h
+1679312639 c:\projet_arith\l3\src\interface.h
 	<unistd.h>
-	<conio.h>
 	"plateau_de_jeu.h"
 
