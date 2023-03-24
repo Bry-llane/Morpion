@@ -111,7 +111,7 @@ bool PutPiont (board b, piont p, int lig, int col)
 
 void gotoxy(int x, int y)
 {
-    printf("\x1b[%d;%dH", y+1, x+1);
+    printf("\033[%d;%dH", y+1, x+1);
 }
 
 ///=========================================================
