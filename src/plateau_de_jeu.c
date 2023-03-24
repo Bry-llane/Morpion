@@ -151,7 +151,7 @@ int* Coup (board b, int p)
     int enter;
     int x = 2, y = 1;
     char c;
-    int* cord = (int) malloc(sizeof(int)*2);
+    int* cord = (int*) malloc(sizeof(int)*2);
 
     while(true)
     {
