@@ -18,9 +18,9 @@ board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour)
 {
     board B = (board)malloc(sizeof(struct board));
 
-    piont **p = (piont **)malloc(ligne*sizeof(piont*));
+    int **p = (int **)malloc(ligne*sizeof(int*));
     for (int i=0; i<ligne; i++){
-        p[i] = (piont*)malloc(colonne*sizeof(piont));
+        p[i] = (int*)malloc(colonne*sizeof(int));
     }
 
     for(int i = 0; i < ligne; i++){
@@ -89,16 +89,16 @@ bool TestEmpty (board b, int lig, int col)
 
 ///=========================================================
 
-piont RecupPiont (board b, int lig, int col)
+int RecupPiont (board b, int lig, int col)
 {
-    piont p = b->pl[lig][col];
+    int p = b->pl[lig][col];
 
     return p;
 }
 
 ///=========================================================
 
-bool PutPiont (board b, piont p, int lig, int col)
+bool PutPiont (board b, int p, int lig, int col)
 {
     if (TestEmpty(b, lig, col)){
         b->pl[lig][col] = p;
@@ -116,7 +116,7 @@ void gotoxy(int x, int y)
 
 ///=========================================================
 
-int* UnCoup (board b, piont p)
+int* UnCoup (board b, int p)
 {
     int lig, col;
     while(true)
@@ -144,7 +144,7 @@ int* UnCoup (board b, piont p)
 
 ///=========================================================
 //coup avec touche directionnel
-int* Coup (board b, piont p)
+int* Coup (board b, int p)
 {
     int lig = 0;
     int col = 0;
@@ -229,7 +229,7 @@ int* Coup (board b, piont p)
 
 ///=========================================================
 //la machine joue
-int* MachineJoue (board b, piont p)
+int* MachineJoue (board b, int p)
 {
     int* best = MeilleureNote(b);
     PutPiont (b, p, best[0], best[1]);

@@ -5,7 +5,7 @@
 
 ///====================Piont==============================
 
-typedef unsigned int piont;
+//typedef unsigned int piont;
 
 ///====================Board_game=========================
 
@@ -13,7 +13,7 @@ typedef struct board {
     int ligne;
     int colonne;
     int nbPiontWin;
-    piont **pl;
+    int **pl;
     int nbJoueur;
     int pos;
 } *board;
@@ -24,11 +24,11 @@ void clear_screen();
 board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour);
 void PrintBoardBis(board b);
 bool TestEmpty (board b, int lig, int col);
-piont RecupPiont (board b, int lig, int col);
-bool PutPiont (board b, piont p, int lig, int col);
+int RecupPiont (board b, int lig, int col);
+bool PutPiont (board b, int p, int lig, int col);
 void gotoxy(int x, int y);
-int* UnCoup (board b, piont p);
-int* Coup (board b, piont p);
-int* MachineJoue (board b, piont p);
+int* UnCoup (board b, int p);
+int* Coup (board b, int p);
+int* MachineJoue (board b, int p);
 
 #endif
