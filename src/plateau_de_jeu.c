@@ -128,8 +128,35 @@ int* UnCoup (board b, pion p)
     int* cord = (int*) malloc(2*sizeof(int));
     cord[0] = lig;
     cord[1] = col;
-    free(cord);
+
     return cord;
+}
+
+///=========================================================
+//Le carreau ayant la plus forte note
+
+int* MeilleureNote (board b)
+{
+    int* carreau = (int*) malloc(2*sizeof(int));
+    carreau[0] = -1;
+    carreau[1] = -1;
+    int bestNote = -1;
+    int p;
+
+    for(int i = 0; i < b->ligne; i++){
+        for(int j = 0; j < b->colonne; j++){
+            if(b->pl[i][j] == 0){
+                p = NoteCarreau (b, i, j);
+                if(p > bestNote){
+                    bestNote = p;
+                    carreau[0] = i;
+                    carreau[1] = j;
+                }
+            }
+        }
+    }
+
+    return carreau;
 }
 
 ///=========================================================
@@ -270,33 +297,6 @@ int NoteCarreau (board b, int lig, int col)
 
     int note = diagGau + diagDro + horizon + vertica;
     return note;
-}
-
-///=========================================================
-//Le carreau ayant la plus forte note
-
-int* MeilleureNote (board b)
-{
-    int* carreau = (int*) malloc(2*sizeof(int));
-    carreau[0] = -1;
-    carreau[1] = -1;
-    int bestNote = -1;
-    int p;
-
-    for(int i = 0; i < b->ligne; i++){
-        for(int j = 0; j < b->colonne; j++){
-            if(b->pl[i][j] == 0){
-                p = NoteCarreau (b, i, j);
-                if(p > bestNote){
-                    bestNote = p;
-                    carreau[0] = i;
-                    carreau[1] = j;
-                }
-            }
-        }
-    }
-
-    return carreau;
 }
 
 ///=========================================================
