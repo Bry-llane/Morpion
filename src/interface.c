@@ -112,8 +112,6 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
             }
         }
 
-        free(coup);
-
         while(SDL_PollEvent(&event))
             {
                 switch(event.type)
@@ -203,7 +201,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
         }
     }
 
-
+    free(coup);
     FreeBoard(b);
 
     SDL_DestroyTexture(croix);
