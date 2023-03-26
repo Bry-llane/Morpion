@@ -3,17 +3,17 @@
 
 #include <stdbool.h>
 
-///====================Piont==============================
+///====================Pion==============================
 
-typedef unsigned int piont;
+typedef unsigned int pion;
 
 ///====================Board_game=========================
 
 typedef struct board {
     int ligne;
     int colonne;
-    int nbPiontWin;
-    piont **pl;
+    int nbPionWin;
+    pion **pl;
     int nbJoueur;
     int pos;
 } *board;
@@ -21,15 +21,13 @@ typedef struct board {
 ///====================Fonctions==========================
 
 void clear_screen();
-board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour);
+board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour);
 void PrintBoardBis(board b);
 bool TestEmpty (board b, int lig, int col);
-piont RecupPiont (board b, int lig, int col);
-bool PutPiont (board b, piont p, int lig, int col);
-void gotoxy(int x, int y);
-int* UnCoup (board b, piont p);
-int* Coup (board b, piont p);
-int* MachineJoue (board b, piont p);
+pion RecupPion (board b, int lig, int col);
+bool PutPion (board b, pion p, int lig, int col);
+int* UnCoup (board b, pion p);
+int* MachineJoue (board b, pion p);
 
 bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec);
 int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec);

@@ -74,7 +74,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
             if(tour != b->pos){
 
                 if(tour == 1){
-                    coup = MachineJoue(b, b->nbPiontWin+1);
+                    coup = MachineJoue(b, b->nbPionWin+1);
                     rect_croix.x = (coup[1]*TAILLE_T) + TAILLE_SEPARATION;
                     rect_croix.y = (coup[0]*TAILLE_T) + TAILLE_SEPARATION;
                     SDL_RenderCopy(renderer, croix, NULL, &rect_croix);
@@ -143,7 +143,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                         }
 
                         if(tour == 1){
-                            if (PutPiont(b, b->nbPiontWin+1, ypos, xpos) == true){
+                            if (PutPion(b, b->nbPionWin+1, ypos, xpos) == true){
                                 ajouer = true;
                                 rect_croix.x = (xpos*TAILLE_T) + TAILLE_SEPARATION;
                                 rect_croix.y = (ypos*TAILLE_T) + TAILLE_SEPARATION;
@@ -157,7 +157,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                             }
 
                         } else {
-                            if (PutPiont(b, 1, ypos, xpos) == true){
+                            if (PutPion(b, 1, ypos, xpos) == true){
                                 ajouer = true;
                                 rect_cercle.x = (xpos*TAILLE_T) + TAILLE_SEPARATION;
                                 rect_cercle.y = (ypos*TAILLE_T) + TAILLE_SEPARATION;
@@ -375,7 +375,7 @@ void save_game_texte(board b, int tour, int nbcaseRestant)
     fprintf(fichier, "%d\n", b->ligne);
     fprintf(fichier, "%d\n", b->nbJoueur);
     fprintf(fichier, "%d\n", b->pos);
-    fprintf(fichier, "%d\n", b->nbPiontWin);
+    fprintf(fichier, "%d\n", b->nbPionWin);
     fprintf(fichier, "%d\n", tour);
     fprintf(fichier, "%d\n", nbcaseRestant);
 
@@ -401,7 +401,7 @@ void save_game_binaire(board b, int tour, int nbcaseRestant)
     fwrite(&b->ligne, sizeof(int), 1, fichier);
     fwrite(&b->nbJoueur, sizeof(int), 1, fichier);
     fwrite(&b->pos, sizeof(int), 1, fichier);
-    fwrite(&b->nbPiontWin, sizeof(int), 1, fichier);
+    fwrite(&b->nbPionWin, sizeof(int), 1, fichier);
     fwrite(&tour, sizeof(int), 1, fichier);
     fwrite(&nbcaseRestant, sizeof(int), 1, fichier);
 
@@ -419,14 +419,14 @@ void save_game_binaire(board b, int tour, int nbcaseRestant)
 
 void load_game_texte(char* save)
 {
-    int col, lig, nbj, pos, nbpiontwin, tour, match_null;
+    int col, lig, nbj, pos, nbPionWin, tour, match_null;
 
     FILE* fichier = NULL;
     fichier = fopen(save, "r");
 
-    fscanf(fichier, "%d %d %d %d %d %d %d", &col, &lig, &nbj, &pos, &nbpiontwin, &tour, &match_null);
+    fscanf(fichier, "%d %d %d %d %d %d %d", &col, &lig, &nbj, &pos, &nbPionWin, &tour, &match_null);
 
-    board b = CreateBoard(lig, col, nbpiontwin, nbj, tour);
+    board b = CreateBoard(lig, col, nbPionWin, nbj, tour);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -457,7 +457,7 @@ void load_game_texte(char* save)
                 rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
-            } else if(b->pl[y][x] == (b->nbPiontWin +1)) {
+            } else if(b->pl[y][x] == (b->nbPionWin +1)) {
                 rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
@@ -481,7 +481,7 @@ void load_game_texte(char* save)
 
 void load_game_binaire(char* save)
 {
-    int col, lig, nbj, pos, nbpiontwin, tour, match_null;
+    int col, lig, nbj, pos, nbPionWin, tour, match_null;
 
     FILE* fichier = NULL;
     fichier = fopen(save, "rb");
@@ -490,11 +490,11 @@ void load_game_binaire(char* save)
     fread(&lig, sizeof(int), 1, fichier);
     fread(&nbj, sizeof(int), 1, fichier);
     fread(&pos, sizeof(int), 1, fichier);
-    fread(&nbpiontwin, sizeof(int), 1, fichier);
+    fread(&nbPionWin, sizeof(int), 1, fichier);
     fread(&tour, sizeof(int), 1, fichier);
     fread(&match_null, sizeof(int), 1, fichier);
 
-    board b = CreateBoard(lig, col, nbpiontwin, nbj, tour);
+    board b = CreateBoard(lig, col, nbPionWin, nbj, tour);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -525,7 +525,7 @@ void load_game_binaire(char* save)
                 rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
-            } else if(b->pl[y][x] == (b->nbPiontWin +1)) {
+            } else if(b->pl[y][x] == (b->nbPionWin +1)) {
                 rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
@@ -720,7 +720,7 @@ void menu_newgame()
     printf("*****************************\n");
     printf("\n");
 
-    int col, lig, nbj, pos, nbpiontwin;
+    int col, lig, nbj, pos, nbPionWin;
 
     printf("Nombre de ligne : ");
     while(true){
@@ -773,8 +773,8 @@ void menu_newgame()
 
     printf("Nombre de piont gagnant : ");
     while(true){
-        nbpiontwin = isInt();
-        if((nbpiontwin <= min(lig, col)) && (nbpiontwin != 1) && (nbpiontwin != 2) && (nbpiontwin != 0)) {
+        nbPionWin = isInt();
+        if((nbPionWin <= min(lig, col)) && (nbPionWin != 1) && (nbPionWin != 2) && (nbPionWin != 0)) {
             break;
         } else {
             printf("Nb <= min(ligne, colonne) et Nb > 2 : ");
@@ -782,7 +782,7 @@ void menu_newgame()
     }
     printf("\n");
 
-    board b = CreateBoard(lig, col, nbpiontwin, nbj, pos);
+    board b = CreateBoard(lig, col, nbPionWin, nbj, pos);
 
     new_game(b);
 

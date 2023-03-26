@@ -1,24 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "plateau_de_jeu.h"
 
 ///=======================================================
 
 void clear_screen()
 {
-    system("cls");
+    system("clear");
 }
 
 ///========================================================
 
-board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour)
+board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour)
 {
     board B = (board)malloc(sizeof(struct board));
 
-    piont **p = (piont **)malloc(ligne*sizeof(piont*));
+    pion **p = (pion **)malloc(ligne*sizeof(pion*));
     for (int i=0; i<ligne; i++){
-        p[i] = (piont*)malloc(colonne*sizeof(piont));
+        p[i] = (pion*)malloc(colonne*sizeof(pion));
     }
 
     for(int i = 0; i < ligne; i++){
@@ -29,7 +28,7 @@ board CreateBoard (int ligne, int colonne, int nbPiontWin, int joueur, int tour)
 
     B->ligne = ligne;
     B->colonne = colonne;
-    B->nbPiontWin = nbPiontWin;
+    B->nbPionWin = nbPionWin;
     B->pl = p;
     B->nbJoueur = joueur;
     B->pos = tour;
@@ -56,7 +55,7 @@ void PrintBoardBis(board b)
                 printf("|   ");
             } else if(b->pl[i][j] == 1){
                 printf("| O ");
-            } else if(b->pl[i][j] == b->nbPiontWin+1){
+            } else if(b->pl[i][j] == b->nbPionWin+1){
                 printf("| X ");
             }
         }
@@ -87,16 +86,16 @@ bool TestEmpty (board b, int lig, int col)
 
 ///=========================================================
 
-piont RecupPiont (board b, int lig, int col)
+pion RecupPion (board b, int lig, int col)
 {
-    piont p = b->pl[lig][col];
+    pion p = b->pl[lig][col];
 
     return p;
 }
 
 ///=========================================================
 
-bool PutPiont (board b, piont p, int lig, int col)
+bool PutPion (board b, pion p, int lig, int col)
 {
     if (TestEmpty(b, lig, col)){
         b->pl[lig][col] = p;
@@ -107,14 +106,7 @@ bool PutPiont (board b, piont p, int lig, int col)
 
 ///=========================================================
 
-void gotoxy(int x, int y)
-{
-    printf("\x1b[%d;%dH", y+1, x+1);
-}
-
-///=========================================================
-
-int* UnCoup (board b, piont p)
+int* UnCoup (board b, pion p)
 {
     int lig, col;
     while(true)
@@ -132,7 +124,7 @@ int* UnCoup (board b, piont p)
         printf("Erreur, rentrez une cordonnee libre\n");
     }
 
-    PutPiont (b, p, lig, col);
+    PutPion (b, p, lig, col);
     int* cord = (int*) malloc(2*sizeof(int));
     cord[0] = lig;
     cord[1] = col;
@@ -141,96 +133,11 @@ int* UnCoup (board b, piont p)
 }
 
 ///=========================================================
-//coup avec touche directionnel
-int* Coup (board b, piont p)
-{
-    int lig = 0;
-    int col = 0;
-    int enter;
-    int x = 2, y = 1;
-    char c;
-    int* cord = (int) malloc(sizeof(int)*2);
-
-    while(true)
-    {
-        clear_screen();
-        PrintBoardBis(b);
-        gotoxy(x, y);
-        enter = 0;
-        while(enter != 1){
-            c = getch();
-            switch(c){
-            case 80:
-                if (lig == b->ligne - 1) {
-                    lig = 0;
-                    y = 1;
-                } else {
-                    lig++;
-                    y = y+2;
-                }
-                gotoxy(x, y);
-                break;
-            case 72:
-                if (lig == 0) {
-                    lig = b->ligne - 1;
-                    y = (b->ligne * 2) - 1;
-                } else {
-                    lig--;
-                    y = y-2;
-                }
-                gotoxy(x, y);
-                break;
-            case 75:
-                if (col == 0) {
-                    col = b->colonne-1;
-                    x = (b->colonne *4) - 2;
-                } else {
-                    col--;
-                    x = x-4;
-                }
-                gotoxy(x, y);
-                break;
-            case 77:
-                if (col == b->colonne - 1) {
-                    col = 0;
-                    x = 2;
-                } else {
-                    col++;
-                    x = x+4;
-                }
-                gotoxy(x, y);
-                break;
-            case 13:
-                enter = 1;
-                break;
-            case 115:
-                clear_screen();
-                cord[0] = -1;
-                enter = 1;
-                break;
-            default :
-                break;
-            }
-        }
-
-        if(TestEmpty (b, lig, col) || cord[0] == -1) break;
-    }
-
-    if(cord[0] == -1) return cord;
-
-    PutPiont (b, p, lig, col);
-    cord[0] = lig;
-    cord[1] = col;
-    clear_screen();
-    return cord;
-}
-
-///=========================================================
 //la machine joue
-int* MachineJoue (board b, piont p)
+int* MachineJoue (board b, pion p)
 {
     int* best = MeilleureNote(b);
-    PutPiont (b, p, best[0], best[1]);
+    PutPion (b, p, best[0], best[1]);
     printf("La machine a joue en (%d; %d)\n", best[1]+1, best[0]+1);
     //sleep(1);
     return best;
@@ -241,7 +148,7 @@ int* MachineJoue (board b, piont p)
 
 bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
-    for(int i = 0; i < b->nbPiontWin; i++){
+    for(int i = 0; i < b->nbPionWin; i++){
         if(lig < 0 || lig >= b->ligne || col < 0 || col >= b->colonne) return false;
         lig += Ligdirec;
         col += Coldirec;
@@ -251,7 +158,7 @@ bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 }
 
 ///=======================????==================================
-//Somme des pionts d'un quintuplet
+//Somme des pions d'un quintuplet
 
 int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
@@ -261,7 +168,7 @@ int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
         return -1;
     }
 
-    for(int i = 0; i < b->nbPiontWin; i++){
+    for(int i = 0; i < b->nbPionWin; i++){
         sum += b->pl[lig][col];
 
         lig += Ligdirec;
@@ -280,19 +187,19 @@ int NoteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 
     if (sumQ == 0) {
         return 1;
-    } else if (sumQ > b->nbPiontWin && (sumQ%(b->nbPiontWin+1)) != 0){
+    } else if (sumQ > b->nbPionWin && (sumQ%(b->nbPionWin+1)) != 0){
         return 0;
     } else if (sumQ == -1) {
         return 0;
     }
 
-    if (sumQ <= b->nbPiontWin) {
+    if (sumQ <= b->nbPionWin) {
         note += 4;
         for(int i = 1; i < sumQ; i++){
             note *= 10;
         }
-    } else if (sumQ > b->nbPiontWin && (sumQ%(b->nbPiontWin+1)) == 0) {
-        int nb = sumQ/(b->nbPiontWin+1);
+    } else if (sumQ > b->nbPionWin && (sumQ%(b->nbPionWin+1)) == 0) {
+        int nb = sumQ/(b->nbPionWin+1);
         note += 9;
         for(int i = 1; i < nb; i++){
             note *= 10;
@@ -303,33 +210,33 @@ int NoteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 }
 
 ///=========================================================
-//Nombre de piont
+//Nombre de pion
 
-int NbPiont (board b, int lig, int col, int Ligdirec, int Coldirec)
+int NbPion (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int sumQ = SommeQuintu (b, lig, col, Ligdirec, Coldirec);
 
     if (sumQ == 0) {
         return 0;
-    } else if (sumQ > b->nbPiontWin && (sumQ%(b->nbPiontWin+1)) != 0){
+    } else if (sumQ > b->nbPionWin && (sumQ%(b->nbPionWin+1)) != 0){
         return -1;
     } else if (sumQ == -1) {
         return -1;
     }
 
-    if (sumQ <= b->nbPiontWin) {
-        if(sumQ == b->nbPiontWin){
-            return b->nbPiontWin;
+    if (sumQ <= b->nbPionWin) {
+        if(sumQ == b->nbPionWin){
+            return b->nbPionWin;
         } else {
             return sumQ;
         }
-    } else if (sumQ > b->nbPiontWin) {
-        if(sumQ/(b->nbPiontWin+1) == b->nbPiontWin){
-            return b->nbPiontWin;
+    } else if (sumQ > b->nbPionWin) {
+        if(sumQ/(b->nbPionWin+1) == b->nbPionWin){
+            return b->nbPionWin;
         } else {
-            return sumQ/(b->nbPiontWin+1);
+            return sumQ/(b->nbPionWin+1);
         }
-        return b->nbPiontWin;
+        return b->nbPionWin;
     }
 }
 
@@ -339,10 +246,10 @@ int NbPiont (board b, int lig, int col, int Ligdirec, int Coldirec)
 int NoteDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int note = 0;
-    int A = lig - (Ligdirec * (b->nbPiontWin-1));
-    int B = col - (Coldirec * (b->nbPiontWin-1));
+    int A = lig - (Ligdirec * (b->nbPionWin-1));
+    int B = col - (Coldirec * (b->nbPionWin-1));
 
-    for (int i = 0; i < b->nbPiontWin; i++) {
+    for (int i = 0; i < b->nbPionWin; i++) {
         note += NoteQuintu (b, A, B, Ligdirec, Coldirec);
         A+=Ligdirec;
         B+=Coldirec;
@@ -397,11 +304,11 @@ int* MeilleureNote (board b)
 
 bool WinDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
-    int A = lig - (Ligdirec * (b->nbPiontWin-1));
-    int B = col - (Coldirec * (b->nbPiontWin-1));
+    int A = lig - (Ligdirec * (b->nbPionWin-1));
+    int B = col - (Coldirec * (b->nbPionWin-1));
 
-    for (int i = 0; i < b->nbPiontWin; i++) {
-        if (NbPiont (b, A, B, Ligdirec, Coldirec) == b->nbPiontWin) return true;
+    for (int i = 0; i < b->nbPionWin; i++) {
+        if (NbPion (b, A, B, Ligdirec, Coldirec) == b->nbPionWin) return true;
         A+=Ligdirec;
         B+=Coldirec;
     }
