@@ -6,7 +6,7 @@
 
 void clear_screen()
 {
-    //system("clear");
+    system("clear");
 }
 
 ///========================================================
@@ -128,7 +128,7 @@ int* UnCoup (board b, pion p)
     int* cord = (int*) malloc(2*sizeof(int));
     cord[0] = lig;
     cord[1] = col;
-
+    free(cord);
     return cord;
 }
 
