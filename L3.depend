@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1679858770 source:c:\projet_arith\l3\src\main.c
+1679860276 source:c:\projet_arith\l3\src\main.c
 	<SDL2/SDL.h>
 	<stdio.h>
 	<stdlib.h>
