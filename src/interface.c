@@ -202,6 +202,13 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
         free(coup);
     }
 
+
+    for(int y = 0; y < b->ligne; y++){
+        free(b->pl[y]);
+    }
+    free(b->pl);
+    free(b);
+
     SDL_DestroyTexture(croix);
     SDL_DestroyTexture(cercle);
 }
@@ -788,10 +795,6 @@ void menu_newgame()
     board b = CreateBoard(lig, col, nbPionWin, nbj, pos);
 
     new_game(b);
-
-    for(int y = 0; y < b->ligne; y++){
-        free(b->pl[y]);
-    }
 }
 
 ///=========================================================
