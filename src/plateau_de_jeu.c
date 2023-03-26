@@ -37,6 +37,20 @@ board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour)
 }
 
 ///=========================================================
+void FreeBoard(board B) {
+    // Libérer la mémoire allouée pour chaque colonne de la grille
+    for(int i = 0; i < B->ligne; i++) {
+        free(B->pl[i]);
+    }
+
+    // Libérer la mémoire allouée pour le tableau de pointeurs de colonnes
+    free(B->pl);
+
+    // Libérer la mémoire allouée pour la structure board
+    free(B);
+}
+
+///=========================================================
 //print non numerote
 void PrintBoardBis(board b)
 {
@@ -102,72 +116,6 @@ bool PutPion (board b, pion p, int lig, int col)
         return true;
     }
     return false;
-}
-
-///=========================================================
-
-int* UnCoup (board b, pion p)
-{
-    int lig, col;
-    while(true)
-    {
-        printf("Entrez la ligne : ");
-        scanf("%d", &lig);
-        printf("Entrez la colonne : ");
-        scanf("%d", &col);
-        lig = lig - 1;
-        col = col - 1;
-
-        if(TestEmpty (b, lig, col)) break;
-        clear_screen();
-        PrintBoardBis(b);
-        printf("Erreur, rentrez une cordonnee libre\n");
-    }
-
-    PutPion (b, p, lig, col);
-    int* cord = (int*) malloc(2*sizeof(int));
-    cord[0] = lig;
-    cord[1] = col;
-
-    return cord;
-}
-
-///=========================================================
-//Le carreau ayant la plus forte note
-
-int* MeilleureNote (board b)
-{
-    int* carreau = (int*) malloc(2*sizeof(int));
-    carreau[0] = -1;
-    carreau[1] = -1;
-    int bestNote = -1;
-    int p;
-
-    for(int i = 0; i < b->ligne; i++){
-        for(int j = 0; j < b->colonne; j++){
-            if(b->pl[i][j] == 0){
-                p = NoteCarreau (b, i, j);
-                if(p > bestNote){
-                    bestNote = p;
-                    carreau[0] = i;
-                    carreau[1] = j;
-                }
-            }
-        }
-    }
-
-    return carreau;
-}
-
-///=========================================================
-//la machine joue
-int* MachineJoue (board b, pion p)
-{
-    int* best = MeilleureNote(b);
-    PutPion (b, p, best[0], best[1]);
-    printf("La machine a joue en (%d; %d)\n", best[1]+1, best[0]+1);
-    //sleep(1);
-    return best;
 }
 
 ///=========================================================
@@ -263,8 +211,8 @@ int NbPion (board b, int lig, int col, int Ligdirec, int Coldirec)
         } else {
             return sumQ/(b->nbPionWin+1);
         }
-        return b->nbPionWin;
     }
+    return b->nbPionWin;
 }
 
 ///=========================================================
@@ -331,5 +279,66 @@ bool HaveWin(board b, int lig, int col)
     return win;
 }
 
+///=========================================================
+//Le carreau ayant la plus forte note
+int* MeilleureNote (board b)
+{
+    int* carreau = (int*) malloc(2*sizeof(int));
+    carreau[0] = -1;
+    carreau[1] = -1;
+    int bestNote = -1;
+    int p;
+
+    for(int i = 0; i < b->ligne; i++){
+        for(int j = 0; j < b->colonne; j++){
+            if(b->pl[i][j] == 0){
+                p = NoteCarreau (b, i, j);
+                if(p > bestNote){
+                    bestNote = p;
+                    carreau[0] = i;
+                    carreau[1] = j;
+                }
+            }
+        }
+    }
+
+    return carreau;
+}
 
 ///=========================================================
+
+int* UnCoup (board b, pion p)
+{
+    int lig, col;
+    while(true)
+    {
+        printf("Entrez la ligne : ");
+        scanf("%d", &lig);
+        printf("Entrez la colonne : ");
+        scanf("%d", &col);
+        lig = lig - 1;
+        col = col - 1;
+
+        if(TestEmpty (b, lig, col)) break;
+        clear_screen();
+        PrintBoardBis(b);
+        printf("Erreur, rentrez une cordonnee libre\n");
+    }
+
+    PutPion (b, p, lig, col);
+    int* cord = (int*) malloc(2*sizeof(int));
+    cord[0] = lig;
+    cord[1] = col;
+
+    return cord;
+}
+
+///=========================================================
+//la machine joue
+int* MachineJoue (board b, pion p)
+{
+    int* best = MeilleureNote(b);
+    PutPion (b, p, best[0], best[1]);
+    printf("La machine a joue en (%d; %d)\n", best[1]+1, best[0]+1);
+    return best;
+}
