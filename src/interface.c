@@ -23,7 +23,7 @@ void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
 
 ///=========================================================
 
-SDL_Texture* loadTexture(SDL_Renderer* renderer, const char* path) {
+SDL_Texture* loadTexture(SDL_Renderer* renderer, char* path) {
     SDL_Surface* surface = SDL_LoadBMP(path); // Charger l'image
     SDL_Texture* texture = NULL; // Texture à retourner
 
@@ -37,7 +37,7 @@ SDL_Texture* loadTexture(SDL_Renderer* renderer, const char* path) {
 
         // Vérifier si la texture a bien été créée
         if (texture == NULL) {
-            printf("Erreur de création de la textur\n");
+            printf("Erreur de création de la texture\n");
         }
 
         // Libérer la surface chargée
@@ -110,9 +110,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                     tour--;
                 }
             }
-        free(coup);
         }
-
 
         while(SDL_PollEvent(&event))
             {
@@ -200,9 +198,8 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                     default:
                         continue;
                 }
-        free(coup);
         }
-
+        free(coup);
     }
 
     SDL_DestroyTexture(croix);
