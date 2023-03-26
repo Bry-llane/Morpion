@@ -2,15 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "plateau_de_jeu.h"
-#include "quintuplets.h"
 #include "interface.h"
 
-#define RAYON 15
-#define SIZE 25
-#define TAILLE_CASE 35
-#define TAILLE_SEPARATION 2
+#define TAILLE_CASE 40
+#define TAILLE_SEPARATION 3
 #define TAILLE_T (TAILLE_CASE+TAILLE_SEPARATION)
-#define CENTRE_CASE (((TAILLE_CASE-1)/2)+TAILLE_SEPARATION)
 
 
 void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
@@ -27,13 +23,45 @@ void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
 
 ///=========================================================
 
+SDL_Texture* loadTexture(SDL_Renderer* renderer, const char* path) {
+    SDL_Surface* surface = SDL_LoadBMP(path); // Charger l'image
+    SDL_Texture* texture = NULL; // Texture à retourner
+
+    // Vérifier si l'image a bien été chargée
+    if (surface == NULL) {
+        printf("Erreur chargement image\n");
+    }
+    else {
+        // Créer une texture à partir de la surface
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+        // Vérifier si la texture a bien été créée
+        if (texture == NULL) {
+            printf("Erreur de création de la textur\n");
+        }
+
+        // Libérer la surface chargée
+        SDL_FreeSurface(surface);
+    }
+
+    return texture; // Retourner la texture créée
+}
+
+///=========================================================
+
 void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
 {
-    SDL_Color rond = { 255, 0, 0, 255 };
-    SDL_Color croix = { 0, 0, 255, 255 };
+    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+
+    SDL_Rect rect_croix, rect_cercle;
+
+    SDL_QueryTexture(cercle, NULL, NULL, &rect_cercle.w, &rect_cercle.h);
+    SDL_QueryTexture(croix, NULL, NULL, &rect_croix.w, &rect_croix.h);
+
     SDL_bool program_launched = SDL_TRUE;
-    int x = 5;
-    int y = 5;
+    int x = TAILLE_SEPARATION;
+    int y = TAILLE_SEPARATION;
     int xpos = 0;
     int ypos = 0;
     int* coup;
@@ -47,7 +75,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
 
                 if(tour == 1){
                     coup = MachineJoue(b, b->nbPiontWin+1);
-                    draw_x(renderer, (coup[1]*TAILLE_T)+CENTRE_CASE, (coup[0]*TAILLE_T)+CENTRE_CASE, SIZE, croix);
+                    rect_croix.x = (coup[1]*TAILLE_T) + TAILLE_SEPARATION;
+                    rect_croix.y = (coup[0]*TAILLE_T) + TAILLE_SEPARATION;
+                    SDL_RenderCopy(renderer, croix, NULL, &rect_croix);
                     SDL_RenderPresent(renderer);
 
                     if (HaveWin(b, coup[0], coup[1]) == true) {
@@ -57,7 +87,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
 
                 } else {
                     coup = MachineJoue(b, 1);
-                    draw_circle(renderer, (coup[1]*TAILLE_T)+CENTRE_CASE, (coup[0]*TAILLE_T)+CENTRE_CASE, RAYON, rond);
+                    rect_cercle.x = (coup[1]*TAILLE_T) + TAILLE_SEPARATION;
+                    rect_cercle.y = (coup[0]*TAILLE_T) + TAILLE_SEPARATION;
+                    SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
                     SDL_RenderPresent(renderer);
 
                     if (HaveWin(b, coup[0], coup[1]) == true) {
@@ -113,7 +145,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                         if(tour == 1){
                             if (PutPiont(b, b->nbPiontWin+1, ypos, xpos) == true){
                                 ajouer = true;
-                                draw_x(renderer, (xpos*TAILLE_T)+CENTRE_CASE, (ypos*TAILLE_T)+CENTRE_CASE, SIZE, croix);
+                                rect_croix.x = (xpos*TAILLE_T) + TAILLE_SEPARATION;
+                                rect_croix.y = (ypos*TAILLE_T) + TAILLE_SEPARATION;
+                                SDL_RenderCopy(renderer, croix, NULL, &rect_croix);
                                 SDL_RenderPresent(renderer);
 
                                 if (HaveWin(b, ypos, xpos) == true) {
@@ -125,7 +159,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                         } else {
                             if (PutPiont(b, 1, ypos, xpos) == true){
                                 ajouer = true;
-                                draw_circle(renderer, (xpos*TAILLE_T)+CENTRE_CASE, (ypos*TAILLE_T)+CENTRE_CASE, RAYON, rond);
+                                rect_cercle.x = (xpos*TAILLE_T) + TAILLE_SEPARATION;
+                                rect_cercle.y = (ypos*TAILLE_T) + TAILLE_SEPARATION;
+                                SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
                                 SDL_RenderPresent(renderer);
 
                                 if (HaveWin(b, ypos, xpos) == true) {
@@ -171,9 +207,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
 
 void draw_morpion(SDL_Renderer* renderer, board b)
 {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     SDL_Rect rectangle;
     for (int x = 0; x <= (b->colonne*TAILLE_T)+TAILLE_SEPARATION; x+=TAILLE_T){
@@ -226,48 +262,6 @@ SDL_Renderer* create_renderer(SDL_Window* window)
         return NULL;
     }
     return renderer;
-}
-
-///=========================================================
-
-void draw_circle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color)
-{
-    // Dessine le cercle pixel par pixel en utilisant la fonction SDL_RenderDrawPoint()
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    for (int w = -radius; w <= radius; w++)
-    {
-        for (int h = -radius; h <= radius; h++)
-        {
-            if (w * w + h * h <= radius * radius)
-            {
-                SDL_RenderDrawPoint(renderer, x + w, y + h);
-            }
-        }
-    }
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    for (int w = -10; w <= 10; w++)
-    {
-        for (int h = -10; h <= 10; h++)
-        {
-            if (w * w + h * h <= 10 * 10)
-            {
-                SDL_RenderDrawPoint(renderer, x + w, y + h);
-            }
-        }
-    }
-}
-
-///=========================================================
-
-void draw_x(SDL_Renderer* renderer, int x, int y, int size, SDL_Color color)
-{
-    // Dessine la première ligne diagonale de l'X
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderDrawLine(renderer, x - size / 2, y - size / 2, x + size / 2, y + size / 2);
-
-    // Dessine la deuxième ligne diagonale de l'X
-    SDL_RenderDrawLine(renderer, x + size / 2, y - size / 2, x - size / 2, y + size / 2);
 }
 
 ///=========================================================
@@ -449,19 +443,30 @@ void load_game_texte(char* save)
         }
     }
 
-    SDL_Color oo = { 255, 0, 0, 255 };
-    SDL_Color xx = { 0, 0, 255, 255 };
+    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+
+    SDL_Rect rect_croix, rect_cercle;
+
+    SDL_QueryTexture(cercle, NULL, NULL, &rect_cercle.w, &rect_cercle.h);
+    SDL_QueryTexture(croix, NULL, NULL, &rect_croix.w, &rect_croix.h);
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
             if(b->pl[y][x] == 1){
-                draw_x(renderer, (x*TAILLE_T)+CENTRE_CASE, (y*TAILLE_T)+CENTRE_CASE, SIZE, xx);
+                rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
+                rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
+                SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
             } else if(b->pl[y][x] == (b->nbPiontWin +1)) {
-                draw_circle(renderer, (x*TAILLE_T)+CENTRE_CASE, (y*TAILLE_T)+CENTRE_CASE, RAYON, oo);
+                rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
+                rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
+                SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
             }
         }
     }
 
+    SDL_DestroyTexture(croix);
+    SDL_DestroyTexture(cercle);
     fclose(fichier);
     remove(save);
 
@@ -506,19 +511,30 @@ void load_game_binaire(char* save)
         }
     }
 
-    SDL_Color oo = { 255, 0, 0, 255 };
-    SDL_Color xx = { 0, 0, 255, 255 };
+    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+
+    SDL_Rect rect_croix, rect_cercle;
+
+    SDL_QueryTexture(cercle, NULL, NULL, &rect_cercle.w, &rect_cercle.h);
+    SDL_QueryTexture(croix, NULL, NULL, &rect_croix.w, &rect_croix.h);
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
             if(b->pl[y][x] == 1){
-                draw_x(renderer, (x*TAILLE_T)+CENTRE_CASE, (y*TAILLE_T)+CENTRE_CASE, SIZE, xx);
+                rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
+                rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
+                SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
             } else if(b->pl[y][x] == (b->nbPiontWin +1)) {
-                draw_circle(renderer, (x*TAILLE_T)+CENTRE_CASE, (y*TAILLE_T)+CENTRE_CASE, RAYON, oo);
+                rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
+                rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
+                SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
             }
         }
     }
 
+    SDL_DestroyTexture(croix);
+    SDL_DestroyTexture(cercle);
     fclose(fichier);
     remove(save);
 
@@ -529,99 +545,6 @@ void load_game_binaire(char* save)
     SDL_Quit();
 }
 
-///=========================================================
-
-void load_game_binaire_sans_SDL(char* save)
-{
-    int col, lig, nbj, pos, nbpiontwin, tour, match_null;
-
-    FILE* fichier = NULL;
-    fichier = fopen(save, "rb");
-
-    fread(&col, sizeof(int), 1, fichier);
-    fread(&lig, sizeof(int), 1, fichier);
-    fread(&nbj, sizeof(int), 1, fichier);
-    fread(&pos, sizeof(int), 1, fichier);
-    fread(&nbpiontwin, sizeof(int), 1, fichier);
-    fread(&tour, sizeof(int), 1, fichier);
-    fread(&match_null, sizeof(int), 1, fichier);
-
-    board b = CreateBoard(lig, col, nbpiontwin, nbj, tour);
-
-    for(int y = 0; y < b->ligne; y++){
-        for(int x = 0; x < b->colonne; x++){
-            fread(&(b->pl[y][x]), sizeof(int), 1, fichier);
-        }
-    }
-
-    fclose(fichier);
-    remove(save);
-
-    int* coup;
-    bool boucle = true;
-
-    while (boucle) {
-        if (b->nbJoueur == 1) {
-            if (tour != b->pos) {
-                if (tour == 1) {
-                    coup = MachineJoue(b, b->nbPiontWin+1);
-                } else {
-                    coup = MachineJoue(b, 1);
-                }
-
-                if (HaveWin(b, coup[0], coup[1])) {
-                    printf("IA win\n");
-                    free(coup);
-                    boucle = false;
-                }
-
-                match_null--;
-                if (match_null == 0) {
-                    printf("Fin de partie : match null");
-                    free(coup);
-                    boucle = false;
-                }
-
-                if (tour == 1) {
-                    tour++;
-                } else {
-                    tour--;
-                }
-            }
-        }
-
-        if(tour == 1){
-            coup = Coup(b, b->nbPiontWin+1);
-        } else {
-            coup = Coup(b, 1);
-        }
-
-        if (coup[0] == -1){
-            save_game_binaire(b, tour, match_null);
-            boucle = false;
-        } else {
-            if (HaveWin(b, coup[0], coup[1])) {
-                printf("Player %d win\n", tour);
-                free(coup);
-                boucle = false;
-            }
-
-            match_null--;
-            if (match_null == 0) {
-                printf("Fin de partie : match null");
-                free(coup);
-                boucle = false;
-            }
-
-            if (tour == 1) {
-                tour++;
-            } else {
-                tour--;
-            }
-        }
-        free(coup);
-    }
-}
 ///=========================================================
 
 void new_game(board b)
@@ -640,78 +563,6 @@ void new_game(board b)
 
     destroy_window_and_renderer(window, renderer);
     SDL_Quit();
-}
-
-///=========================================================
-
-void new_game_sans_SDL(board b)
-{
-    int tour = 1;
-    int match_null = b->colonne * b->ligne;
-    int* coup;
-    bool boucle = true;
-
-    while (boucle) {
-        if (b->nbJoueur == 1) {
-            if (tour != b->pos) {
-                if (tour == 1) {
-                    coup = MachineJoue(b, b->nbPiontWin+1);
-                } else {
-                    coup = MachineJoue(b, 1);
-                }
-
-                if (HaveWin(b, coup[0], coup[1])) {
-                    printf("IA win\n");
-                    free(coup);
-                    boucle = false;
-                }
-
-                match_null--;
-                if (match_null == 0) {
-                    printf("Fin de partie : match null");
-                    free(coup);
-                    boucle = false;
-                }
-
-                if (tour == 1) {
-                    tour++;
-                } else {
-                    tour--;
-                }
-            }
-        }
-
-        if(tour == 1){
-            coup = Coup(b, b->nbPiontWin+1);
-        } else {
-            coup = Coup(b, 1);
-        }
-
-        if (coup[0] == -1){
-            save_game_binaire(b, tour, match_null);
-            boucle = false;
-        } else {
-            if (HaveWin(b, coup[0], coup[1])) {
-                printf("Player %d win\n", tour);
-                free(coup);
-                boucle = false;
-            }
-
-            match_null--;
-            if (match_null == 0) {
-                printf("Fin de partie : match null");
-                free(coup);
-                boucle = false;
-            }
-
-            if (tour == 1) {
-                tour++;
-            } else {
-                tour--;
-            }
-        }
-        free(coup);
-    }
 }
 
 ///=========================================================
