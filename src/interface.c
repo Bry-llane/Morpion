@@ -110,6 +110,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                     tour--;
                 }
             }
+        free(coup);
         }
 
 
@@ -199,10 +200,11 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                     default:
                         continue;
                 }
+        free(coup);
         }
 
     }
-    free(coup);
+
     SDL_DestroyTexture(croix);
     SDL_DestroyTexture(cercle);
 }
