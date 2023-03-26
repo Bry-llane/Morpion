@@ -201,6 +201,9 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
         }
         free(coup);
     }
+
+    SDL_DestroyTexture(croix);
+    SDL_DestroyTexture(cercle);
 }
 
 ///=========================================================
