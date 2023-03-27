@@ -161,7 +161,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                                 ajouer = true;
                                 rect_cercle.x = (xpos*TAILLE_T) + TAILLE_SEPARATION;
                                 rect_cercle.y = (ypos*TAILLE_T) + TAILLE_SEPARATION;
-                                SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
+                                SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
                                 SDL_RenderPresent(renderer);
 
                                 if (HaveWin(b, ypos, xpos) == true) {
