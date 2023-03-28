@@ -3,14 +3,14 @@
 #include "plateau_de_jeu.h"
 
 ///=======================================================
-
-void clear_screen()
+//Pour nettoyer le terminal sous linux
+void Clear_screen()
 {
     system("clear");
 }
 
 ///========================================================
-
+//creation du plateau de jeu
 board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour)
 {
     board B = (board)malloc(sizeof(struct board));
@@ -37,21 +37,49 @@ board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour)
 }
 
 ///=========================================================
+//recuperer un pion present sur une case
+pion RecupPion (board b, int lig, int col)
+{
+    pion p = b->pl[lig][col];
+
+    return p;
+}
+
+///=========================================================
+//Teste si une case est vide ou non
+bool TestEmpty (board b, int lig, int col)
+{
+    if(RecupPion (b, lig, col) == 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+///=========================================================
+//mettre un pion dans une case du tableau
+bool PutPion (board b, pion p, int lig, int col)
+{
+    if (TestEmpty(b, lig, col)){
+        b->pl[lig][col] = p;
+        return true;
+    }
+    return false;
+}
+
+///=========================================================
+// Libérer la mémoire allouée pour le plateau de jeu
 void FreeBoard(board B) {
-    // Libérer la mémoire allouée pour chaque colonne de la grille
     for(int i = 0; i < B->ligne; i++) {
         free(B->pl[i]);
     }
 
-    // Libérer la mémoire allouée pour le tableau de pointeurs de colonnes
     free(B->pl);
-
-    // Libérer la mémoire allouée pour la structure board
     free(B);
 }
 
 ///=========================================================
-//print non numerote
+//Afficher le plateau de jeu
 void PrintBoardBis(board b)
 {
     printf("+");
@@ -65,11 +93,11 @@ void PrintBoardBis(board b)
 
     for(int i = 0; i < b->ligne; i++){
         for(int j = 0; j < b->colonne; j++){
-            if(b->pl[i][j] == 0){
+            if(RecupPion (b, i, j) == 0){
                 printf("|   ");
-            } else if(b->pl[i][j] == 1){
+            } else if(RecupPion (b, i, j) == 1){
                 printf("| O ");
-            } else if(b->pl[i][j] == b->nbPionWin+1){
+            } else if(RecupPion (b, i, j) == b->nbPionWin+1){
                 printf("| X ");
             }
         }
@@ -88,39 +116,7 @@ void PrintBoardBis(board b)
 }
 
 ///=========================================================
-
-bool TestEmpty (board b, int lig, int col)
-{
-    if(b->pl[lig][col] == 0) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-///=========================================================
-
-pion RecupPion (board b, int lig, int col)
-{
-    pion p = b->pl[lig][col];
-
-    return p;
-}
-
-///=========================================================
-
-bool PutPion (board b, pion p, int lig, int col)
-{
-    if (TestEmpty(b, lig, col)){
-        b->pl[lig][col] = p;
-        return true;
-    }
-    return false;
-}
-
-///=========================================================
 //Test l'existence d'un quintuplet
-
 bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     for(int i = 0; i < b->nbPionWin; i++){
@@ -132,9 +128,8 @@ bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
     return true;
 }
 
-///=======================????==================================
+///=========================================================
 //Somme des pions d'un quintuplet
-
 int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int sum = 0;
@@ -144,7 +139,7 @@ int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
     }
 
     for(int i = 0; i < b->nbPionWin; i++){
-        sum += b->pl[lig][col];
+        sum += RecupPion (b, lig, col);
 
         lig += Ligdirec;
         col += Coldirec;
@@ -154,7 +149,6 @@ int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 
 ///=========================================================
 //Note d'un quintuplet
-
 int NoteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int note = 1;
@@ -185,8 +179,7 @@ int NoteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec)
 }
 
 ///=========================================================
-//Nombre de pion
-
+//Nombre de pions dans un quintuplet
 int NbPion (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int sumQ = SommeQuintu (b, lig, col, Ligdirec, Coldirec);
@@ -217,7 +210,6 @@ int NbPion (board b, int lig, int col, int Ligdirec, int Coldirec)
 
 ///=========================================================
 //Note dans une direction
-
 int NoteDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int note = 0;
@@ -235,7 +227,6 @@ int NoteDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 
 ///=========================================================
 //Note d'un carreau
-
 int NoteCarreau (board b, int lig, int col)
 {
     int diagGau = NoteDir (b, lig, col, 1, 1);
@@ -249,7 +240,6 @@ int NoteCarreau (board b, int lig, int col)
 
 ///=========================================================
 //S'il y a un quintuplet gagnant dans une direction
-
 bool WinDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 {
     int A = lig - (Ligdirec * (b->nbPionWin-1));
@@ -266,7 +256,6 @@ bool WinDir (board b, int lig, int col, int Ligdirec, int Coldirec)
 
 ///=========================================================
 //Pour detecter si un coup est gagnant
-
 bool HaveWin(board b, int lig, int col)
 {
     bool diagGau = WinDir (b, lig, col, 1, 1);
@@ -291,7 +280,7 @@ int* MeilleureNote (board b)
 
     for(int i = 0; i < b->ligne; i++){
         for(int j = 0; j < b->colonne; j++){
-            if(b->pl[i][j] == 0){
+            if(RecupPion (b, i, j) == 0){
                 p = NoteCarreau (b, i, j);
                 if(p > bestNote){
                     bestNote = p;
@@ -306,7 +295,7 @@ int* MeilleureNote (board b)
 }
 
 ///=========================================================
-
+//Pour permettre a un joueur de jouer
 int* UnCoup (board b, pion p)
 {
     int lig, col;
@@ -320,7 +309,7 @@ int* UnCoup (board b, pion p)
         col = col - 1;
 
         if(TestEmpty (b, lig, col)) break;
-        clear_screen();
+        Clear_screen();
         PrintBoardBis(b);
         printf("Erreur, rentrez une cordonnee libre\n");
     }

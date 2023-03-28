@@ -9,7 +9,42 @@
 #define TAILLE_T (TAILLE_CASE+TAILLE_SEPARATION)
 
 
-void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
+///=========================================================
+//Creation de la fenetre
+SDL_Window* Create_window(const char* title, board b)
+{
+    SDL_Window* window = SDL_CreateWindow(title,
+                              SDL_WINDOWPOS_CENTERED,
+                              SDL_WINDOWPOS_CENTERED,
+                              (b->colonne*TAILLE_T)+TAILLE_SEPARATION,
+                              (b->ligne*TAILLE_T)+TAILLE_SEPARATION,
+                              SDL_WINDOW_SHOWN);
+
+    if (!window)
+    {
+        printf("Erreur lors de la création de la fenêtre SDL : %s\n", SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
+
+    return window;
+}
+
+///=========================================================
+//Creation du rendu
+SDL_Renderer* Create_renderer(SDL_Window* window)
+{
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer)
+    {
+        fprintf(stderr, "Erreur : impossible de créer le renderer SDL\n");
+        return NULL;
+    }
+    return renderer;
+}
+
+///=========================================================
+//Destruction de la fenetre et du rendu
+void Destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
 {
     if (renderer)
     {
@@ -22,37 +57,212 @@ void destroy_window_and_renderer(SDL_Window* window, SDL_Renderer* renderer)
 }
 
 ///=========================================================
+//Creation d'une texture a partir d'une image
+SDL_Texture* LoadTexture(SDL_Renderer* renderer, char* path)
+{
+    SDL_Surface* surface = SDL_LoadBMP(path);
+    SDL_Texture* texture = NULL;
 
-SDL_Texture* loadTexture(SDL_Renderer* renderer, char* path) {
-    SDL_Surface* surface = SDL_LoadBMP(path); // Charger l'image
-    SDL_Texture* texture = NULL; // Texture à retourner
-
-    // Vérifier si l'image a bien été chargée
     if (surface == NULL) {
         printf("Erreur chargement image\n");
     }
     else {
-        // Créer une texture à partir de la surface
         texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-        // Vérifier si la texture a bien été créée
         if (texture == NULL) {
             printf("Erreur de création de la texture\n");
         }
-
-        // Libérer la surface chargée
         SDL_FreeSurface(surface);
     }
 
-    return texture; // Retourner la texture créée
+    return texture;
 }
 
 ///=========================================================
-
-void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
+//Dessiner le plateau de jeu
+void Draw_morpion(SDL_Renderer* renderer, board b)
 {
-    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
-    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+    SDL_Rect rectangle;
+    for (int x = 0; x <= (b->colonne*TAILLE_T)+TAILLE_SEPARATION; x+=TAILLE_T){
+        rectangle.x = x;
+        rectangle.y = 0;
+        rectangle.w = TAILLE_SEPARATION;
+        rectangle.h = (b->ligne*TAILLE_T)+TAILLE_SEPARATION;
+
+        SDL_RenderFillRect(renderer, &rectangle);
+    }
+
+    for (int y = 0; y <= (b->ligne*TAILLE_T)+TAILLE_SEPARATION; y+=TAILLE_T){
+        rectangle.x = 0;
+        rectangle.y = y;
+        rectangle.w = (b->colonne*TAILLE_T)+TAILLE_SEPARATION;
+        rectangle.h = TAILLE_SEPARATION;
+
+        SDL_RenderFillRect(renderer, &rectangle);
+    }
+}
+
+///=========================================================
+//Verifie si le nombre entrer est un entier
+int IsInt()
+{
+    int num;
+    char c;
+
+    while(true){
+        if(scanf("%d", &num)!= 1){
+            printf("Veuillez rentrer un chiffre : ");
+            while((c = getchar()) != '\n' && c != EOF);
+        } else {
+           break;
+        }
+    }
+
+    return num;
+}
+
+///=========================================================
+//Verifie l'existence d'un fichier
+bool ExisteFile(char* file)
+{
+    FILE *fichier = NULL;
+    fichier = fopen(file, "r");
+
+    if (fichier == NULL) {
+        return false;
+    } else {
+        fclose(fichier);
+        return true;
+    }
+}
+
+///=========================================================
+//Renommer un fichier
+void Rename_save()
+{
+    printf("\n");
+
+    if(ExisteFile("./save/save1.txt")){
+        printf("1 : Sauvegarde 1\n");
+    } else {
+        printf("1 : Empty \n");
+    }
+
+    if(ExisteFile("./save/save2.txt")){
+        printf("2 : Sauvegarde 2\n");
+    } else {
+        printf("2 : Empty \n");
+    }
+
+    if(ExisteFile("./save/save3.txt")){
+        printf("3 : Sauvegarde 3\n");
+    } else {
+        printf("3 : Empty \n\n");
+    }
+
+    int choix;
+    bool boucle = true;
+
+    while (boucle){
+        printf("Attente du numero choisi : ");
+        choix = IsInt();
+
+        switch(choix){
+            case 1:
+                if(ExisteFile("./save/save1.txt")){
+                    remove("./save/save1.txt");
+                }
+                rename("./src/save.txt", "./save/save1.txt");
+                boucle = false;
+                break;
+
+            case 2:
+                if(ExisteFile("./save/save2.txt")){
+                    remove("./save/save2.txt");
+                }
+                rename("./src/save.txt", "./save/save2.txt");
+                boucle = false;
+                break;
+
+            case 3:
+                if(ExisteFile("./save/save3.txt")){
+                    remove("./save/save3.txt");
+                }
+                rename("./src/save.txt", "./save/save3.txt");
+                boucle = false;
+                break;
+
+            case 4:
+                boucle = false;
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+///=========================================================
+//Sauvegarger le jeu en texte
+void Save_game_texte(board b, int tour, int nbcaseRestant)
+{
+    FILE* fichier = NULL;
+    fichier = fopen("./src/save.txt", "w+");
+
+    fprintf(fichier, "%d\n", b->colonne);
+    fprintf(fichier, "%d\n", b->ligne);
+    fprintf(fichier, "%d\n", b->nbJoueur);
+    fprintf(fichier, "%d\n", b->pos);
+    fprintf(fichier, "%d\n", b->nbPionWin);
+    fprintf(fichier, "%d\n", tour);
+    fprintf(fichier, "%d\n", nbcaseRestant);
+
+    for(int y = 0; y < b->ligne; y++){
+        for(int x = 0; x < b->colonne; x++){
+            fprintf(fichier, "%d ", RecupPion (b, y, x));
+        }
+        fprintf(fichier, "\n");
+    }
+
+    fclose(fichier);
+    Rename_save();
+}
+
+///=========================================================
+//Sauvegarger le jeu en binaire
+void Save_game_binaire(board b, int tour, int nbcaseRestant)
+{
+    FILE* fichier = NULL;
+    fichier = fopen("./src/save.txt", "wb");
+
+    fwrite(&b->colonne, sizeof(int), 1, fichier);
+    fwrite(&b->ligne, sizeof(int), 1, fichier);
+    fwrite(&b->nbJoueur, sizeof(int), 1, fichier);
+    fwrite(&b->pos, sizeof(int), 1, fichier);
+    fwrite(&b->nbPionWin, sizeof(int), 1, fichier);
+    fwrite(&tour, sizeof(int), 1, fichier);
+    fwrite(&nbcaseRestant, sizeof(int), 1, fichier);
+
+    for(int y = 0; y < b->ligne; y++){
+        for(int x = 0; x < b->colonne; x++){
+            fwrite(&b->pl[y][x], sizeof(int), 1, fichier);
+        }
+    }
+
+    fclose(fichier);
+    Rename_save();
+}
+
+///=========================================================
+//Une partie de jeu
+void Manche(SDL_Renderer* renderer, board b, int tour, int match_null)
+{
+    SDL_Texture* cercle = LoadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = LoadTexture(renderer, "./images/Croix.bmp");
 
     SDL_Rect rect_croix, rect_cercle;
 
@@ -120,7 +330,7 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
                         switch(event.key.keysym.sym)
                         {
                             case SDLK_s:
-                                save_game_binaire(b, tour, match_null);
+                                Save_game_binaire(b, tour, match_null);
                                 program_launched = SDL_FALSE;
                                 break;
 
@@ -206,223 +416,17 @@ void manche(SDL_Renderer* renderer, board b, int tour, int match_null)
 
     SDL_DestroyTexture(croix);
     SDL_DestroyTexture(cercle);
-}
 
-///=========================================================
-
-void draw_morpion(SDL_Renderer* renderer, board b)
-{
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-    SDL_Rect rectangle;
-    for (int x = 0; x <= (b->colonne*TAILLE_T)+TAILLE_SEPARATION; x+=TAILLE_T){
-        rectangle.x = x;
-        rectangle.y = 0;
-        rectangle.w = TAILLE_SEPARATION;
-        rectangle.h = (b->ligne*TAILLE_T)+TAILLE_SEPARATION;
-
-        SDL_RenderFillRect(renderer, &rectangle);
-    }
-
-    for (int y = 0; y <= (b->ligne*TAILLE_T)+TAILLE_SEPARATION; y+=TAILLE_T){
-        rectangle.x = 0;
-        rectangle.y = y;
-        rectangle.w = (b->colonne*TAILLE_T)+TAILLE_SEPARATION;
-        rectangle.h = TAILLE_SEPARATION;
-
-        SDL_RenderFillRect(renderer, &rectangle);
+    int choix = 0;
+    while(choix != 1){
+        printf("Appuyer 1 pour continuer\n");
+        choix = IsInt();
     }
 }
 
 ///=========================================================
-
-SDL_Window* create_window(const char* title, board b)
-{
-    SDL_Window* window = SDL_CreateWindow(title,
-                              SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED,
-                              (b->colonne*TAILLE_T)+TAILLE_SEPARATION,
-                              (b->ligne*TAILLE_T)+TAILLE_SEPARATION,
-                              SDL_WINDOW_SHOWN);
-
-    if (!window)
-    {
-        printf("Erreur lors de la création de la fenêtre SDL : %s\n", SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    return window;
-}
-
-///=========================================================
-
-SDL_Renderer* create_renderer(SDL_Window* window)
-{
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer)
-    {
-        fprintf(stderr, "Erreur : impossible de créer le renderer SDL\n");
-        return NULL;
-    }
-    return renderer;
-}
-
-///=========================================================
-
-int isInt()
-{
-    int num;
-    char c;
-
-    while(true){
-        if(scanf("%d", &num)!= 1){
-            printf("Veuillez rentrer un chiffre : ");
-            while((c = getchar()) != '\n' && c != EOF);
-        } else {
-           break;
-        }
-    }
-
-    return num;
-}
-
-///=========================================================
-
-bool existeFile(char* file)
-{
-    FILE *fichier = NULL;
-    fichier = fopen(file, "r");
-
-    if (fichier == NULL) {
-        return false;
-    } else {
-        fclose(fichier);
-        return true;
-    }
-}
-
-///=========================================================
-
-void rename_save()
-{
-    printf("\n");
-
-    if(existeFile("./save/save1.txt")){
-        printf("1 : Sauvegarde 1\n");
-    } else {
-        printf("1 : Empty \n");
-    }
-
-    if(existeFile("./save/save2.txt")){
-        printf("2 : Sauvegarde 2\n");
-    } else {
-        printf("2 : Empty \n");
-    }
-
-    if(existeFile("./save/save3.txt")){
-        printf("3 : Sauvegarde 3\n");
-    } else {
-        printf("3 : Empty \n\n");
-    }
-
-    int choix;
-    bool boucle = true;
-
-    while (boucle){
-        printf("Attente du numero choisi : ");
-        choix = isInt();
-
-        switch(choix){
-            case 1:
-                if(existeFile("./save/save1.txt")){
-                    remove("./save/save1.txt");
-                }
-                rename("./src/save.txt", "./save/save1.txt");
-                boucle = false;
-                break;
-
-            case 2:
-                if(existeFile("./save/save2.txt")){
-                    remove("./save/save2.txt");
-                }
-                rename("./src/save.txt", "./save/save2.txt");
-                boucle = false;
-                break;
-
-            case 3:
-                if(existeFile("./save/save3.txt")){
-                    remove("./save/save3.txt");
-                }
-                rename("./src/save.txt", "./save/save3.txt");
-                boucle = false;
-                break;
-
-            case 4:
-                boucle = false;
-                break;
-
-            default:
-                break;
-        }
-    }
-}
-
-///=========================================================
-
-void save_game_texte(board b, int tour, int nbcaseRestant)
-{
-    FILE* fichier = NULL;
-    fichier = fopen("./src/save.txt", "w+");
-
-    fprintf(fichier, "%d\n", b->colonne);
-    fprintf(fichier, "%d\n", b->ligne);
-    fprintf(fichier, "%d\n", b->nbJoueur);
-    fprintf(fichier, "%d\n", b->pos);
-    fprintf(fichier, "%d\n", b->nbPionWin);
-    fprintf(fichier, "%d\n", tour);
-    fprintf(fichier, "%d\n", nbcaseRestant);
-
-    for(int y = 0; y < b->ligne; y++){
-        for(int x = 0; x < b->colonne; x++){
-            fprintf(fichier, "%d ", b->pl[y][x]);
-        }
-        fprintf(fichier, "\n");
-    }
-
-    fclose(fichier);
-    rename_save();
-}
-
-///=========================================================
-
-void save_game_binaire(board b, int tour, int nbcaseRestant)
-{
-    FILE* fichier = NULL;
-    fichier = fopen("./src/save.txt", "wb");
-
-    fwrite(&b->colonne, sizeof(int), 1, fichier);
-    fwrite(&b->ligne, sizeof(int), 1, fichier);
-    fwrite(&b->nbJoueur, sizeof(int), 1, fichier);
-    fwrite(&b->pos, sizeof(int), 1, fichier);
-    fwrite(&b->nbPionWin, sizeof(int), 1, fichier);
-    fwrite(&tour, sizeof(int), 1, fichier);
-    fwrite(&nbcaseRestant, sizeof(int), 1, fichier);
-
-    for(int y = 0; y < b->ligne; y++){
-        for(int x = 0; x < b->colonne; x++){
-            fwrite(&b->pl[y][x], sizeof(int), 1, fichier);
-        }
-    }
-
-    fclose(fichier);
-    rename_save();
-}
-
-///=========================================================
-
-void load_game_texte(char* save)
+//Charger une sauvegarde texte
+void Load_game_texte(char* save)
 {
     int col, lig, nbj, pos, nbPionWin, tour, match_null;
 
@@ -438,9 +442,9 @@ void load_game_texte(char* save)
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    window = create_window("Morpion", b);
-    renderer = create_renderer(window);
-    draw_morpion(renderer, b);
+    window = Create_window("Morpion", b);
+    renderer = Create_renderer(window);
+    Draw_morpion(renderer, b);
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
@@ -448,8 +452,8 @@ void load_game_texte(char* save)
         }
     }
 
-    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
-    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+    SDL_Texture* cercle = LoadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = LoadTexture(renderer, "./images/Croix.bmp");
 
     SDL_Rect rect_croix, rect_cercle;
 
@@ -458,11 +462,11 @@ void load_game_texte(char* save)
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
-            if(b->pl[y][x] == 1){
+            if(RecupPion (b, y, x) == 1){
                 rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
-            } else if(b->pl[y][x] == (b->nbPionWin +1)) {
+            } else if(RecupPion (b, y, x) == (b->nbPionWin +1)) {
                 rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
@@ -476,15 +480,15 @@ void load_game_texte(char* save)
     remove(save);
 
     SDL_RenderPresent(renderer);
-    manche(renderer, b, tour, match_null);
+    Manche(renderer, b, tour, match_null);
 
-    destroy_window_and_renderer(window, renderer);
+    Destroy_window_and_renderer(window, renderer);
     SDL_Quit();
 }
 
 ///=========================================================
-
-void load_game_binaire(char* save)
+//Charger une sauvegarde binaire
+void Load_game_binaire(char* save)
 {
     int col, lig, nbj, pos, nbPionWin, tour, match_null;
 
@@ -506,9 +510,9 @@ void load_game_binaire(char* save)
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    window = create_window("Morpion", b);
-    renderer = create_renderer(window);
-    draw_morpion(renderer, b);
+    window = Create_window("Morpion", b);
+    renderer = Create_renderer(window);
+    Draw_morpion(renderer, b);
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
@@ -516,8 +520,8 @@ void load_game_binaire(char* save)
         }
     }
 
-    SDL_Texture* cercle = loadTexture(renderer, "./images/Cercle.bmp");
-    SDL_Texture* croix = loadTexture(renderer, "./images/Croix.bmp");
+    SDL_Texture* cercle = LoadTexture(renderer, "./images/Cercle.bmp");
+    SDL_Texture* croix = LoadTexture(renderer, "./images/Croix.bmp");
 
     SDL_Rect rect_croix, rect_cercle;
 
@@ -526,14 +530,14 @@ void load_game_binaire(char* save)
 
     for(int y = 0; y < b->ligne; y++){
         for(int x = 0; x < b->colonne; x++){
-            if(b->pl[y][x] == 1){
+            if(RecupPion (b, y, x) == 1){
                 rect_cercle.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_cercle.y = (y*TAILLE_T) + TAILLE_SEPARATION;
                 SDL_RenderCopy(renderer, cercle, NULL, &rect_cercle);
-            } else if(b->pl[y][x] == (b->nbPionWin +1)) {
+            } else if(RecupPion (b, y, x) == (b->nbPionWin +1)) {
                 rect_croix.x = (x*TAILLE_T) + TAILLE_SEPARATION;
                 rect_croix.y = (y*TAILLE_T) + TAILLE_SEPARATION;
-                SDL_RenderCopy(renderer, croix, NULL, &rect_cercle);
+                SDL_RenderCopy(renderer, croix, NULL, &rect_croix);
             }
         }
     }
@@ -544,55 +548,55 @@ void load_game_binaire(char* save)
     remove(save);
 
     SDL_RenderPresent(renderer);
-    manche(renderer, b, tour, match_null);
+    Manche(renderer, b, tour, match_null);
 
-    destroy_window_and_renderer(window, renderer);
+    Destroy_window_and_renderer(window, renderer);
     SDL_Quit();
 }
 
 ///=========================================================
-
-void new_game(board b)
+//Lancer une nouvelle partie
+void New_game(board b)
 {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
-    window = create_window("Morpion", b);
-    renderer = create_renderer(window);
+    window = Create_window("Morpion", b);
+    renderer = Create_renderer(window);
 
-    draw_morpion(renderer, b);
+    Draw_morpion(renderer, b);
 
     SDL_RenderPresent(renderer);
-    manche(renderer, b, 1, b->colonne * b->ligne);
+    Manche(renderer, b, 1, b->colonne * b->ligne);
 
-    destroy_window_and_renderer(window, renderer);
+    Destroy_window_and_renderer(window, renderer);
     SDL_Quit();
 }
 
 ///=========================================================
-
-void menu_sauvegarde()
+//Menu de sauvegarde
+void Menu_sauvegarde()
 {
-    clear_screen();
+    Clear_screen();
     printf("*****************************\n");
     printf("*         Sauvegarde        *\n");
     printf("*****************************\n");
     printf("\n");
 
-    if(existeFile("./save/save1.txt")){
+    if(ExisteFile("./save/save1.txt")){
         printf("1 : Sauvegarde 1\n");
     } else {
         printf("1 : Empty \n");
     }
 
-    if(existeFile("./save/save2.txt")){
+    if(ExisteFile("./save/save2.txt")){
         printf("2 : Sauvegarde 2\n");
     } else {
         printf("2 : Empty \n");
     }
 
-    if(existeFile("./save/save3.txt")){
+    if(ExisteFile("./save/save3.txt")){
         printf("3 : Sauvegarde 3\n");
     } else {
         printf("3 : Empty \n");
@@ -605,26 +609,26 @@ void menu_sauvegarde()
 
     while (boucle){
         printf("Attente du numero choisi : ");
-        choix = isInt();
+        choix = IsInt();
 
         switch(choix){
             case 1:
-                if(existeFile("./save/save1.txt")){
-                    load_game_binaire("./save/save1.txt");
+                if(ExisteFile("./save/save1.txt")){
+                    Load_game_binaire("./save/save1.txt");
                     boucle = false;
                 }
                 break;
 
             case 2:
-                if(existeFile("./save/save2.txt")){
-                    load_game_binaire("./save/save2.txt");
+                if(ExisteFile("./save/save2.txt")){
+                    Load_game_binaire("./save/save2.txt");
                     boucle = false;
                 }
                 break;
 
             case 3:
-                if(existeFile("./save/save3.txt")){
-                    load_game_binaire("./save/save3.txt");
+                if(ExisteFile("./save/save3.txt")){
+                    Load_game_binaire("./save/save3.txt");
                     boucle = false;
                 }
                 break;
@@ -640,28 +644,28 @@ void menu_sauvegarde()
 }
 
 ///=========================================================
-
-void menu_delete()
+//Menu de delete
+void Menu_delete()
 {
-    clear_screen();
+    Clear_screen();
     printf("*****************************\n");
     printf("*           Delete          *\n");
     printf("*****************************\n");
     printf("\n");
 
-    if(existeFile("./save/save1.txt")){
+    if(ExisteFile("./save/save1.txt")){
         printf("1 : Sauvegarde 1\n");
     } else {
         printf("1 : Empty \n");
     }
 
-    if(existeFile("./save/save2.txt")){
+    if(ExisteFile("./save/save2.txt")){
         printf("2 : Sauvegarde 2\n");
     } else {
         printf("2 : Empty \n");
     }
 
-    if(existeFile("./save/save3.txt")){
+    if(ExisteFile("./save/save3.txt")){
         printf("3 : Sauvegarde 3\n");
     } else {
         printf("3 : Empty \n");
@@ -674,25 +678,25 @@ void menu_delete()
 
     while (boucle){
         printf("Attente du numero choisi : ");
-        choix = isInt();
+        choix = IsInt();
 
         switch(choix){
             case 1:
-                if(existeFile("./save/save1.txt")){
+                if(ExisteFile("./save/save1.txt")){
                     remove("./save/save1.txt");
                     boucle = false;
                 }
                 break;
 
             case 2:
-                if(existeFile("./save/save2.txt")){
+                if(ExisteFile("./save/save2.txt")){
                     remove("./save/save2.txt");
                     boucle = false;
                 }
                 break;
 
             case 3:
-                if(existeFile("./save/save3.txt")){
+                if(ExisteFile("./save/save3.txt")){
                     remove("./save/save3.txt");
                     boucle = false;
                 }
@@ -709,17 +713,17 @@ void menu_delete()
 }
 
 ///=========================================================
-
-int min(int a, int b)
+//Minimum entre deux entiers
+int Min(int a, int b)
 {
     return a < b ? a : b;
 }
 
 ///=========================================================
-
-void menu_newgame()
+//Menu d'une nouvelle partie
+void Menu_newgame()
 {
-    clear_screen();
+    Clear_screen();
     printf("*****************************\n");
     printf("*          NewGame          *\n");
     printf("*****************************\n");
@@ -729,7 +733,7 @@ void menu_newgame()
 
     printf("Nombre de ligne : ");
     while(true){
-        lig = isInt();
+        lig = IsInt();
         if(lig > 2) {
             break;
         } else {
@@ -740,7 +744,7 @@ void menu_newgame()
 
     printf("Nombre de colonne : ");
     while(true){
-        col = isInt();
+        col = IsInt();
         if(col > 2) {
             break;
         } else {
@@ -751,7 +755,7 @@ void menu_newgame()
 
     printf("Nombre de joueur : ");
     while(true){
-        nbj = isInt();
+        nbj = IsInt();
         if((nbj == 1) || (nbj == 2)){
             break;
         } else {
@@ -763,7 +767,7 @@ void menu_newgame()
     if(nbj == 1){
         printf("1 pour jouer en premier 2 sinon : ");
         while(true){
-            pos = isInt();
+            pos = IsInt();
             if((pos == 1) || (pos == 2)){
                 break;
             } else {
@@ -778,26 +782,26 @@ void menu_newgame()
 
     printf("Nombre de piont gagnant : ");
     while(true){
-        nbPionWin = isInt();
-        if((nbPionWin <= min(lig, col)) && (nbPionWin != 1) && (nbPionWin != 2) && (nbPionWin != 0)) {
+        nbPionWin = IsInt();
+        if((nbPionWin <= Min(lig, col)) && (nbPionWin != 1) && (nbPionWin != 2) && (nbPionWin != 0)) {
             break;
         } else {
-            printf("Nb <= min(ligne, colonne) et Nb > 2 : ");
+            printf("Nb <= Min(ligne, colonne) et Nb > 2 : ");
         }
     }
     printf("\n");
 
     board b = CreateBoard(lig, col, nbPionWin, nbj, pos);
 
-    new_game(b);
+    New_game(b);
 }
 
 ///=========================================================
-
-void menu_principale()
+//Menu principale
+void Menu_principale()
 {
 debut:
-    clear_screen();
+    Clear_screen();
     int choix;
 
     printf("*****************************\n");
@@ -814,22 +818,21 @@ debut:
 
     while (boucle){
         printf("Attente du numero choisi : ");
-        choix = isInt();
+        choix = IsInt();
 
         switch (choix){
             case 1:
-                menu_newgame();
-                sleep(2);
+                Menu_newgame();
                 goto debut;
                 break;
 
             case 2:
-                menu_sauvegarde();
+                Menu_sauvegarde();
                 goto debut;
                 break;
 
             case 3:
-                menu_delete();
+                Menu_delete();
                 goto debut;
                 break;
 

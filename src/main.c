@@ -6,6 +6,6 @@
 
 int main(int argc, char** argv)
 {
-    menu_principale();
+    Menu_principale();
     return 0;
 }

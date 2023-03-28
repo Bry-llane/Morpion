@@ -1,19 +1,19 @@
 # depslib dependency file v1.0
-1679860575 source:c:\projet_arith\l3\src\main.c
+1680037272 source:c:\projet_arith\l3\src\main.c
 	<SDL2/SDL.h>
 	<stdio.h>
 	<stdlib.h>
 	"plateau_de_jeu.h"
 	"interface.h"
 
-1679866156 c:\projet_arith\l3\src\plateau_de_jeu.h
+1680035951 c:\projet_arith\l3\src\plateau_de_jeu.h
 	<stdbool.h>
 
 1676664770 c:\projet_arith\l3\src\quintuplets.h
 	<stdbool.h>
 	"plateau_de_jeu.h"
 
-1679866156 source:c:\projet_arith\l3\src\plateau_de_jeu.c
+1680034649 source:c:\projet_arith\l3\src\plateau_de_jeu.c
 	<stdio.h>
 	<stdlib.h>
 	"plateau_de_jeu.h"
@@ -23,7 +23,7 @@
 	<stdlib.h>
 	"quintuplets.h"
 
-1679866156 source:c:\projet_arith\l3\src\interface.c
+1680038555 source:c:\projet_arith\l3\src\interface.c
 	<SDL2/SDL.h>
 	<stdio.h>
 	<stdlib.h>
@@ -35,7 +35,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1679858830 c:\projet_arith\l3\src\interface.h
+1680038704 c:\projet_arith\l3\src\interface.h
 	<unistd.h>
 	"plateau_de_jeu.h"
 

@@ -22,11 +22,11 @@ typedef struct board {
 
 void clear_screen();
 board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour);
+pion RecupPion (board b, int lig, int col);
+bool TestEmpty (board b, int lig, int col);
+bool PutPion (board b, pion p, int lig, int col);
 void FreeBoard(board B);
 void PrintBoardBis(board b);
-bool TestEmpty (board b, int lig, int col);
-pion RecupPion (board b, int lig, int col);
-bool PutPion (board b, pion p, int lig, int col);
 
 bool ExisteQuintu (board b, int lig, int col, int Ligdirec, int Coldirec);
 int SommeQuintu (board b, int lig, int col, int Ligdirec, int Coldirec);
@@ -37,9 +37,7 @@ int NoteCarreau (board b, int lig, int col);
 bool WinDir (board b, int lig, int col, int Ligdirec, int Coldirec);
 bool HaveWin(board b, int lig, int col);
 int* MeilleureNote (board b);
-
 int* UnCoup (board b, pion p);
 int* MachineJoue (board b, pion p);
-
 
 #endif

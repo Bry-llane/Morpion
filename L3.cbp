@@ -42,10 +42,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/plateau_de_jeu.h" />
-		<Unit filename="src/quintuplets.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/quintuplets.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
