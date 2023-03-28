@@ -780,7 +780,7 @@ void Menu_newgame()
     }
 
 
-    printf("Nombre de piont gagnant : ");
+    printf("Nombre de pions gagnant : ");
     while(true){
         nbPionWin = IsInt();
         if((nbPionWin <= Min(lig, col)) && (nbPionWin != 1) && (nbPionWin != 2) && (nbPionWin != 0)) {
