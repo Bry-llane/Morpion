@@ -20,7 +20,7 @@ typedef struct board {
 
 ///====================Fonctions==========================
 
-void clear_screen();
+void Clear_screen();
 board CreateBoard (int ligne, int colonne, int nbPionWin, int joueur, int tour);
 pion RecupPion (board b, int lig, int col);
 bool TestEmpty (board b, int lig, int col);
